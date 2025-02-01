@@ -651,16 +651,16 @@
 
           while (von === "") {
             if (inputVonNotwendig) {
-              von = ask("Von?");
-              von = await von;
+              von = await ask("Von?");
+              von.toLowerCase
             }
 
             let möglich = felderReal(felderVerzeichnis, [von]);
             if (möglich) {
               möglich = richtigerAmZug(felderVerzeichnis, von, amZug);
               if (möglich) {
-                zu = ask("Zu?");
-                zu = await zu;
+                zu = await ask("Zu?");
+                zu.toLowerCase
                 möglich = felderReal(felderVerzeichnis, [zu]);
                 if (möglich) {
                   let koordinateVon = feldZuKoordinate(von, felderVerzeichnis);
