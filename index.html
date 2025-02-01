@@ -382,10 +382,10 @@
               let königBewegt, turmBewegt;
               if (amZug === "w") {
                 königBewegt = rochadeWeiss.könig_bewegt;
-                turmBewegt = rochadeWeiss[turm_${zu}_bewegt] || false;
+                turmBewegt = rochadeWeiss[`turm_${zu}_bewegt`] || false;
               } else {
                 königBewegt = rochadeSchwarz.könig_bewegt;
-                turmBewegt = rochadeSchwarz[turm_${zu}_bewegt] || false;
+                turmBewegt = rochadeSchwarz[`turm_${zu}_bewegt`] || false;
               }
 
               if (!königBewegt && !turmBewegt) {
@@ -754,7 +754,7 @@
 
           if (!matt) {
             say(
-              ${amZug} ist dran.,
+              `${amZug} ist dran.`,
               amZug == "schwarz" ? "black" : "white",
               amZug == "schwarz" ? "right" : "left"
             );
@@ -769,7 +769,7 @@
         }
 
         say(
-          ${amZug === "weiß" ? "Schwarz" : "Weiß"} gewinnt!,
+          `${amZug === "weiß" ? "Schwarz" : "Weiß"} gewinnt!`,
           "green",
           "center"
         );
