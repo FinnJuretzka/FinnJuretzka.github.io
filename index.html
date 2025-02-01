@@ -6,16 +6,16 @@
     <title>Interaktive Seite</title>
     <style>
         body {
-            font-size: 1.2em; /* Grundgröße der Schrift */
-            text-align: center; /* Zentriert den Inhalt */
+            font-size: 1.2em;
+            text-align: center;
             margin: 20px;
             font-family: Arial, sans-serif;
         }
 
         input {
-            width: 80%; /* Passt die Breite des Eingabefelds an */
-            max-width: 400px; /* Begrenzt die maximale Größe */
-            font-size: 1.2em; /* Erhöht die Schriftgröße */
+            width: 80%;
+            max-width: 400px;
+            font-size: 1.2em;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -41,6 +41,14 @@
             font-size: 1.5em;
         }
 
+        #bild {
+            margin-top: 20px;
+            display: none;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+        }
+
         @media (max-width: 600px) {
             body {
                 font-size: 1em;
@@ -57,13 +65,20 @@
         function zeigeErgebnis() {
             let eingabe = document.getElementById("eingabe").value;
             let ausgabe = document.getElementById("ausgabe");
+            let bild = document.getElementById("bild");
 
             if (eingabe.toLowerCase() === "hallo") {
                 ausgabe.innerText = "Hallo! Schön, dich hier zu sehen!";
+                bild.style.display = "none";
             } else if (eingabe.toLowerCase() === "github") {
                 ausgabe.innerText = "Du benutzt GitHub Pages!";
+                bild.style.display = "none";
+            } else if (eingabe.toLowerCase() === "bild") {
+                ausgabe.innerText = "Hier ist dein Bild:";
+                bild.style.display = "block";
             } else {
                 ausgabe.innerText = "Ich kenne diese Eingabe nicht.";
+                bild.style.display = "none";
             }
         }
     </script>
@@ -73,5 +88,7 @@
     <input type="text" id="eingabe">
     <button onclick="zeigeErgebnis()">Absenden</button>
     <p id="ausgabe"></p>
+    <img id="bild" src="https://source.unsplash.com/500x300/?landscape" alt="Ein zufälliges Landschaftsbild">
 </body>
 </html>
+            
