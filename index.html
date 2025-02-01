@@ -1,3 +1,77 @@
-"Hallo Welt" 
-Dies ist meine eigene Website!
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktive Seite</title>
+    <style>
+        body {
+            font-size: 1.2em; /* Grundgröße der Schrift */
+            text-align: center; /* Zentriert den Inhalt */
+            margin: 20px;
+            font-family: Arial, sans-serif;
+        }
 
+        input {
+            width: 80%; /* Passt die Breite des Eingabefelds an */
+            max-width: 400px; /* Begrenzt die maximale Größe */
+            font-size: 1.2em; /* Erhöht die Schriftgröße */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            font-size: 1.2em;
+            padding: 10px 20px;
+            margin-top: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #ausgabe {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                font-size: 1em;
+            }
+            input, button {
+                font-size: 1em;
+            }
+            #ausgabe {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+    <script>
+        function zeigeErgebnis() {
+            let eingabe = document.getElementById("eingabe").value;
+            let ausgabe = document.getElementById("ausgabe");
+
+            if (eingabe.toLowerCase() === "hallo") {
+                ausgabe.innerText = "Hallo! Schön, dich hier zu sehen!";
+            } else if (eingabe.toLowerCase() === "github") {
+                ausgabe.innerText = "Du benutzt GitHub Pages!";
+            } else {
+                ausgabe.innerText = "Ich kenne diese Eingabe nicht.";
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Gib etwas ein:</h1>
+    <input type="text" id="eingabe">
+    <button onclick="zeigeErgebnis()">Absenden</button>
+    <p id="ausgabe"></p>
+</body>
+</html>
