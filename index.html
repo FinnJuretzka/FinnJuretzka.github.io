@@ -83,7 +83,7 @@
       async function starteSchachprogramm() {
         document.body.innerHTML = ""; // Löscht den Inhalt der Seite
         let h1 = document.createElement("h1");
-        h1.innerText = "Das Schachspiel startet hier!";
+        h1.innerText = "Online-Nebelschachschiedsrichter";
         document.body.appendChild(h1);
         let dialog = document.createElement("div");
         dialog.id = "dialog";
@@ -659,7 +659,7 @@
             if (möglich) {
               möglich = richtigerAmZug(felderVerzeichnis, von, amZug);
               if (möglich) {
-                zu = await ask("Zu?");
+                zu = await ask("Nach?");
                 zu.toLowerCase
                 möglich = felderReal(felderVerzeichnis, [zu]);
                 if (möglich) {
@@ -744,7 +744,7 @@
 
           if (geschlagen) {
             say(
-              `Es wurde einen ${amZug === "weiß" ? "schwarzen" : "weißen"} ${
+              `Es wurde ein ${amZug === "weiß" ? "schwarzer" : "weißer"} ${
                 geschlagen.split("_")[0]
               } geschlagen.`,
               "green",
