@@ -4,61 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Interaktive Seite</title>
-    <style>
-      body {
-        font-size: 1.2em;
-        text-align: center;
-        margin: 20px;
-        font-family: Arial, sans-serif;
-      }
-
-      input,
-      button {
-        width: 80%;
-        max-width: 400px;
-        font-size: 1.2em;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-      }
-
-      button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        cursor: pointer;
-      }
-
-      button:hover {
-        background-color: #0056b3;
-      }
-
-      #ausgabe {
-        margin-top: 20px;
-        font-size: 1.5em;
-      }
-
-      #bild {
-        margin-top: 20px;
-        display: none;
-        width: 80%;
-        max-width: 500px;
-        border-radius: 10px;
-      }
-
-      @media (max-width: 600px) {
-        body {
-          font-size: 1em;
-        }
-        input,
-        button {
-          font-size: 1em;
-        }
-        #ausgabe {
-          font-size: 1.3em;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="style.css">
     <script>
       function zeigeErgebnis() {
         let eingabe = document.getElementById("eingabe").value;
