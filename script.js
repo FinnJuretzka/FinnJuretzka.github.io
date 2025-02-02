@@ -685,7 +685,7 @@ function zeigeErgebnis() {
               `Es wurde ein ${amZug === "weiß" ? "schwarzer" : "weißer"} ${
                 geschlagen.split("_")[0]
               } geschlagen.`,
-              "green",
+              "#17E100",
               "center"
             );
           }
@@ -708,7 +708,7 @@ function zeigeErgebnis() {
 
         say(
           `${amZug === "weiß" ? "Schwarz" : "Weiß"} gewinnt!`,
-          "green",
+          "#17E100",
           "center"
         );
       }
