@@ -1,1 +1,1 @@
-const version = '$(git rev-parse --short HEAD)';
+const version = '555b1e3';
