@@ -182,22 +182,34 @@ async function starteSchachprogramm() {
 
   function ask(question) {
     let input = document.createElement("input");
-    if (!show) input.type = "password"
-    input.classList.add("input")
+    if (!show) input.type = "password";
+    input.classList.add("input");
     input.placeholder = question;
+
     let button = document.createElement("button");
     button.innerText = "Absenden";
+
     dialog.appendChild(input);
     dialog.appendChild(button);
-    return new Promise((resolve) => {
-      button.onclick = () => {
-        resolve(input.value);
-        input.remove();
-        button.remove();
-      };
-    });
-  }
 
+    input.focus(); // Setzt den Fokus direkt auf das Eingabefeld
+
+    return new Promise((resolve) => {
+        function submit() {
+            resolve(input.value);
+            input.remove();
+            button.remove();
+        }
+
+        button.onclick = submit; // Klick auf den Button löst Eingabe aus
+
+        input.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                submit();
+            }
+        });
+    });
+}
   function confirm() {
     let confirm = document.createElement("button");
     confirm.innerText = "Zug Ausführen";
