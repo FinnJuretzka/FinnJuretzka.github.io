@@ -1,1 +1,1 @@
-const version = '7ce3676';
+const version = '8dd7327';
