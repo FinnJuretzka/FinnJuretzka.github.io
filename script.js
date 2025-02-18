@@ -1,3 +1,4 @@
+const version = 1
 function zeigeErgebnis() {
   let eingabe = document.getElementById("eingabe").value;
   let ausgabe = document.getElementById("ausgabe");
