@@ -206,7 +206,7 @@ async function starteSchachprogramm() {
   function say(message, color, text_align) {
     let text = document.createElement("p");
     text.style.color = color || "black";
-    text.innerText = message;
+    text.innerText = message.charAt(0).toUpperCase() + message.slice(1);
     text.style.textAlign = text_align || "left";
     dialog.appendChild(text);
   }
