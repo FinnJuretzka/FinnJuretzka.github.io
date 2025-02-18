@@ -21,6 +21,14 @@ function zeigeErgebnis() {
 async function starteSchachprogramm() {
   document.body.innerHTML = ""; // Löscht den Inhalt der Seite
   let h1 = document.createElement("h1");
+  let show_input = document.createElement("button")
+  var show = false
+  button.innerText = "zeige Input"
+  button.onclick = () => {
+    show = button.innerText != "zeige Input"
+    button.innerText =  !show ? "verstecke Input" : "zeige Input"
+
+  }
   h1.innerText = "Online-Nebelschachschiedsrichter";
   document.body.appendChild(h1);
   let dialog = document.createElement("div");
@@ -167,7 +175,7 @@ async function starteSchachprogramm() {
 
   function ask(question) {
     let input = document.createElement("input");
-    input.type = "password"
+    if (!show) input.type = "password"
     input.placeholder = question;
     let button = document.createElement("button");
     button.innerText = "Absenden";
@@ -207,6 +215,7 @@ async function starteSchachprogramm() {
     let text = document.createElement("p");
     text.style.color = color || "black";
     text.innerText = message.charAt(0).toUpperCase() + message.slice(1);
+    console.log(text.innerText)
     text.style.textAlign = text_align || "left";
     dialog.appendChild(text);
   }
