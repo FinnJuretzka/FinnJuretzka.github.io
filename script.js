@@ -1,4 +1,4 @@
-const version = 1
+console.log("test")
 function zeigeErgebnis() {
   let eingabe = document.getElementById("eingabe").value;
   let ausgabe = document.getElementById("ausgabe");
@@ -723,6 +723,7 @@ async function starteSchachprogramm() {
 document.addEventListener("DOMContentLoaded", (event) => {
   document.getElementById("nebelBtn").onclick = function () {
     document.body.innerHTML = "";
+    console.log("clicked")
     starteSchachprogramm();
   };
 });
