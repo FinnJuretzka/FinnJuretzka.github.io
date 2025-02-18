@@ -29,7 +29,6 @@ async function starteSchachprogramm() {
     let show = show_input.innerText != "Eingabe wird angezeigt"
     show_input.innerText =  !show ? "Eingabe wird angezeigt" : "Eingabe wird angezeigt"
     let inputs = document.getElementsByClassName("input")
-    console.log(inputs)
     for(let input of inputs){
       console.log(input)
       input.type = show ? "text" : "password"
@@ -183,7 +182,7 @@ async function starteSchachprogramm() {
   function ask(question) {
     let input = document.createElement("input");
     if (!show) input.type = "password"
-    input.classList.add("list")
+    input.classList.add("input")
     input.placeholder = question;
     let button = document.createElement("button");
     button.innerText = "Absenden";
