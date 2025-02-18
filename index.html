@@ -17,6 +17,14 @@
       alt="Ein zufälliges Landschaftsbild"
     />
     <button id="nebelBtn">Brauchst du einen Nebelschachschiedsrichter?</button>
-    <script src="script.js"></script>
+    <script>
+      fetch('version.js')
+          .then(response => response.text())
+          .then(version => {
+              let script = document.createElement('script');
+              script.src = 'script.js?v=' + version.match(/'([^']+)'/)[1]; 
+              document.head.appendChild(script);
+          });
+    </script>
   </body>
 </html>
