@@ -31,6 +31,7 @@ async function starteSchachprogramm() {
   }
   h1.innerText = "Online-Nebelschachschiedsrichter";
   document.body.appendChild(h1);
+  document.body.appendChild(show_input)
   let dialog = document.createElement("div");
   dialog.id = "dialog";
   dialog.style.textAlign = "left";
