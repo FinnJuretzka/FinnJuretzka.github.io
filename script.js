@@ -26,8 +26,8 @@ async function starteSchachprogramm() {
   var show = false
   show_input.innerText = "zeige Input"
   show_input.onclick = () => {
-    show = button.innerText != "zeige Input"
-    button.innerText =  !show ? "verstecke Input" : "zeige Input"
+    show = show_input.innerText != "zeige Input"
+    show_input.innerText =  !show ? "verstecke Input" : "zeige Input"
 
   }
   h1.innerText = "Online-Nebelschachschiedsrichter";
