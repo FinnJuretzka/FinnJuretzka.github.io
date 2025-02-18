@@ -31,7 +31,7 @@ async function starteSchachprogramm() {
     let inputs = document.getElementsByClassName("input")
     for(let input of inputs){
       console.log(input)
-      input.type = show ? "text" : "password"
+      input.type = show ? "password" : "text"
       console.log(input)
     }
   }
