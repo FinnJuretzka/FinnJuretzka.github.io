@@ -29,7 +29,7 @@ async function starteSchachprogramm() {
     let show = show_input.innerText != "Eingabe wird angezeigt"
     show_input.innerText =  !show ? "Eingabe wird angezeigt" : "Eingabe wird angezeigt"
     let inputs = document.getElementsByClassName("input")
-    console.log(input)
+    console.log(inputs)
     for(let input of inputs){
       console.log(input)
       input.type = show ? "text" : "password"
