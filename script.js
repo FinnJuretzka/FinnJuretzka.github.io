@@ -167,6 +167,7 @@ async function starteSchachprogramm() {
 
   function ask(question) {
     let input = document.createElement("input");
+    input.type = "password"
     input.placeholder = question;
     let button = document.createElement("button");
     button.innerText = "Absenden";
