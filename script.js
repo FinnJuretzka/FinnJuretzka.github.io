@@ -27,11 +27,12 @@ async function starteSchachprogramm() {
   show_input.innerText = "Eingabe wird angezeigt"
   show_input.onclick = () => {
     let show = show_input.innerText != "Eingabe wird angezeigt"
-    show_input.innerText =  !show ? "Eingabe wird angezeigt" : "Eingabe wird angezeigt"
+    show_input.innerText =  show ? "Eingabe wird angezeigt" : "Eingabe wird ausgeblendet"
     let inputs = document.getElementsByClassName("input")
     for(let input of inputs){
       console.log(input)
       input.type = show ? "text" : "password"
+      console.log(input)
     }
   }
   h1.innerText = "Online-Nebelschachschiedsrichter";
