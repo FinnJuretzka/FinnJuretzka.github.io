@@ -3,11 +3,14 @@ name: Update version.js
 on:
   push:
     branches:
-      - main  # Falls du eine andere Branch benutzt, ändere das hier
+      - main
 
 jobs:
   update-version:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Erlaubt das Schreiben ins Repo
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -20,5 +23,7 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add version.js
-          git commit -m "Update version.js" || echo "No changes to commit"
+          git commit -m "Update version.js" || exit 0
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
