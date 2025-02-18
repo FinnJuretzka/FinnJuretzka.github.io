@@ -32,7 +32,7 @@ async function starteSchachprogramm() {
     console.log(input)
     for(let input of inputs){
       console.log(input)
-      input.type = "text"
+      input.type = show ? "text" : "password"
     }
   }
   h1.innerText = "Online-Nebelschachschiedsrichter";
