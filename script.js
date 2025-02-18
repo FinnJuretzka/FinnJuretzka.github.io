@@ -23,8 +23,8 @@ async function starteSchachprogramm() {
   let h1 = document.createElement("h1");
   let show_input = document.createElement("button")
   var show = false
-  button.innerText = "zeige Input"
-  button.onclick = () => {
+  show_input.innerText = "zeige Input"
+  show_input.onclick = () => {
     show = button.innerText != "zeige Input"
     button.innerText =  !show ? "verstecke Input" : "zeige Input"
 
