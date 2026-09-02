@@ -99,11 +99,14 @@ main {
   font-family: "Fraunces", serif;
   font-style: italic;
   font-weight: 500;
-  /* Viel größer, um den Fokus auf die große Zeit zu legen */
-  font-size: clamp(2.5rem, 14vw, 4rem);
+  /* Groß, aber so dass es in eine Zeile passt */
+  font-size: clamp(1.8rem, 11vw, 2.8rem);
   line-height: 1.1;
   color: var(--gold);
   width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .label {
