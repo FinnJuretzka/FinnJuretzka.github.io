@@ -98,10 +98,12 @@ main {
   margin: 0 0 8px;
   font-family: "Fraunces", serif;
   font-style: italic;
-  font-weight: 440;
-  /* etwas größer, damit Jahre/Monate hervorgehoben werden */
-  font-size: clamp(1.1rem, 5vw, 1.35rem);
+  font-weight: 500;
+  /* Viel größer, um den Fokus auf die große Zeit zu legen */
+  font-size: clamp(2.5rem, 14vw, 4rem);
+  line-height: 1.1;
   color: var(--gold);
+  width: 100%;
 }
 
 .label {
