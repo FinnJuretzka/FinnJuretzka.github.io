@@ -1,3 +1,30 @@
-"Hallo Welt" 
-Dies ist meine eigene Website!
-
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finns Seite</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <h1>Gib etwas ein:</h1>
+    <input type="text" id="eingabe" />
+    <button onclick="zeigeErgebnis()">Absenden</button>
+    <p id="ausgabe"></p>
+    <img
+      id="bild"
+      src="https://elch-urlaub.de/wp-content/uploads/ferienhaus-schweden-am-see-1-e1660053319341-1024x575.jpg"
+      alt="Ein zufälliges Landschaftsbild"
+    />
+    <button id="nebelBtn" onclick="starteSchachprogramm()">Brauchst du einen Nebelschachschiedsrichter?</button>
+    <script>
+      fetch('version.js')
+          .then(response => response.text())
+          .then(version => {
+              let script = document.createElement('script');
+              script.src = 'script.js?v=' + version.match(/'([^']+)'/)[1]; 
+              document.head.appendChild(script);
+          });
+    </script>
+  </body>
+</html>

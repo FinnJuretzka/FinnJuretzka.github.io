@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mama & Finn</title>
+  <meta name="description" content="Wie weit die Zeit schon gekommen ist.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,440;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Roboto Mono for monospaced countdown digits -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main>
+    <section class="map-frame" aria-label="Karte mit Flugroute">
+      <img class="map-image" src="assets/Karte.png" alt="Karte der Arktis mit eingezeichneter Flugroute von Alaska nach Skandinavien">
+      <img class="plane-image" id="plane" src="assets/Flugzeug.png" alt="" aria-hidden="true">
+    </section>
+
+    <section class="countdown" aria-label="Verbleibende Zeit">
+      <p class="context">15&nbsp;Jahre 5,67&nbsp;Monate</p>
+      <p class="label">Mama &amp; Finn Zeit noch pausiert für</p>
+
+      <div class="numbers" id="countdown">
+        <div class="unit">
+          <span class="value" id="cd-days">000</span>
+          <span class="name">Tage</span>
+        </div>
+        <div class="unit">
+          <span class="value" id="cd-hours">00</span>
+          <span class="name">Std</span>
+        </div>
+        <div class="unit">
+          <span class="value" id="cd-minutes">00</span>
+          <span class="name">Min</span>
+        </div>
+        <div class="unit unit--seconds">
+          <span class="value" id="cd-seconds">
+            <span class="sd" id="cd-s-0">0</span><span class="sd" id="cd-s-1">0</span><span class="sd sep" id="cd-s-sep">,</span><span class="sd" id="cd-c-0">0</span><span class="sd" id="cd-c-1">0</span>
+          </span>
+          <span class="name">Sek</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

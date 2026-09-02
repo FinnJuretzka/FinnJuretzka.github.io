@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#1a1d1e" />
+    <title>Pachelbel Canon &amp; Destiny of Love</title>
+    <link rel="icon" href="data:," />
+    <style>
+      :root {
+        --bg: #1a1d1e;
+        --accent: #e8c88a;
+        --accent-soft: rgba(232, 200, 138, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg);
+      }
+
+      #play-btn {
+        position: relative;
+        width: 132px;
+        height: 132px;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        appearance: none;
+        -webkit-appearance: none;
+        -webkit-tap-highlight-color: transparent;
+        background: radial-gradient(circle at 35% 30%, #2c3234, #16181a);
+        color: var(--accent);
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.06),
+          0 18px 40px rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      #play-btn:hover {
+        transform: scale(1.04);
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.1),
+          0 22px 46px rgba(0, 0, 0, 0.55);
+      }
+
+      #play-btn:active {
+        transform: scale(0.96);
+      }
+
+      #play-btn::before {
+        content: "";
+        position: absolute;
+        inset: -16px;
+        border-radius: 50%;
+        border: 1px solid var(--accent-soft);
+        opacity: 0;
+        transform: scale(0.88);
+        transition:
+          opacity 0.4s ease,
+          transform 0.4s ease;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      #play-btn.playing::before {
+        opacity: 1;
+        transform: scale(1);
+        animation: pulse 2.6s ease-out infinite;
+      }
+
+      #play-btn svg {
+        position: relative;
+        z-index: 1;
+        display: block;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 var(--accent-soft);
+        }
+        70% {
+          box-shadow: 0 0 0 20px rgba(232, 200, 138, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(232, 200, 138, 0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #play-btn,
+        #play-btn::before {
+          transition: none;
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button
+      id="play-btn"
+      aria-label="Pachelbel Canon und Destiny of Love abspielen"
+    >
+      <svg id="icon-play" viewBox="0 0 24 24" width="36" height="36" aria-hidden="true">
+        <path d="M8 5v14l11-7z" fill="currentColor" />
+      </svg>
+      <svg
+        id="icon-pause"
+        viewBox="0 0 24 24"
+        width="36"
+        height="36"
+        aria-hidden="true"
+        style="display: none"
+      >
+        <rect x="6" y="5" width="4" height="14" fill="currentColor" />
+        <rect x="14" y="5" width="4" height="14" fill="currentColor" />
+      </svg>
+    </button>
+
+    <audio id="audio" preload="none"></audio>
+
+    <script src="main.js"></script>
+  </body>
+</html>

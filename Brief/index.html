@@ -1,0 +1,222 @@
+<!-- Moin Paul! Ich bin jetzt auch ins Website-Vibe-Coding eingestiegen! Und rate mal, womit ich heute Abend (28.8) angefangen habe! -->
+
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A 250</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #f7f7f5;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #111;
+    }
+
+    .container {
+        width: 90%;
+        max-width: 600px;
+        text-align: center;
+    }
+
+    h1 {
+        margin: 0 0 35px 0;
+        font-size: clamp(5rem, 20vw, 10rem);
+        font-weight: 700;
+        line-height: 0.9;
+        letter-spacing: -0.06em;
+    }
+
+    input {
+        width: 100%;
+        max-width: 500px;
+        padding: 16px 20px;
+        font-size: 1.1rem;
+        text-align: center;
+        border: 2px solid #111;
+        border-radius: 8px;
+        outline: none;
+        background: white;
+    }
+
+    input:focus {
+        border-color: #555;
+    }
+
+    .letter-wrap {
+        display: grid;
+        grid-template-rows: 0fr;
+        margin-top: 45px;
+        transition: grid-template-rows 1.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    .letter-wrap.show {
+        grid-template-rows: 1fr;
+    }
+
+    .letter {
+        overflow: hidden;
+        min-height: 0;
+        opacity: 0;
+        transition: opacity 1.3s ease 0.35s;
+        padding: 35px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-align: left;
+        line-height: 1.7;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 1.05rem;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.06);
+        white-space: pre-line;
+    }
+
+    .letter-wrap.show .letter {
+        opacity: 1;
+    }
+
+    .shake {
+        animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+        0%   { transform: translateX(0); }
+        15%  { transform: translateX(-18px); }
+        30%  { transform: translateX(18px); }
+        45%  { transform: translateX(-14px); }
+        60%  { transform: translateX(14px); }
+        75%  { transform: translateX(-7px); }
+        90%  { transform: translateX(7px); }
+        100% { transform: translateX(0); }
+    }
+</style>
+
+</head>
+
+<body>
+
+<div class="container" id="mainContent">
+
+    <h1>A 250</h1>
+
+    <input
+        id="answer"
+        type="text"
+        autocomplete="off"
+        autofocus
+    >
+
+    <div id="letterWrap" class="letter-wrap">
+        <div id="letter" class="letter"></div>
+    </div>
+
+</div>
+
+
+<script>
+
+    // ==========================================================
+    // HIER DEINEN BRIEF EINTRAGEN
+    // ==========================================================
+
+    const briefText = `
+
+Lieber Mensch,
+
+hier steht dein Platzhaltertext.
+
+Du kannst diesen Text später einfach
+durch deinen richtigen Brief ersetzen.
+
+Viele Grüße
+
+A 250
+`;
+
+    // ==========================================================
+    // AB HIER NICHTS MEHR ÄNDERN
+    // ==========================================================
+
+    const input = document.getElementById("answer");
+    const letter = document.getElementById("letter");
+    const letterWrap = document.getElementById("letterWrap");
+    const mainContent = document.getElementById("mainContent");
+
+
+    function checkAnswer() {
+
+        // Eingabe:
+        // Groß-/Kleinschreibung ignorieren
+        // ALLE Leerzeichen entfernen
+        const answer = input.value
+            .toLowerCase()
+            .replace(/\s+/g, "");
+
+
+        // ======================================================
+        // RICHTIGE ANTWORT
+        // ======================================================
+
+        if (answer === "stadelandesbergen") {
+
+            letter.textContent = briefText;
+            letterWrap.classList.add("show");
+
+        }
+
+
+        // ======================================================
+        // FALSCHE ANTWORT
+        // ======================================================
+
+        else {
+
+            // Brief verstecken
+            letterWrap.classList.remove("show");
+
+            // Eingabefeld leeren
+            input.value = "";
+
+            // Animation zurücksetzen
+            mainContent.classList.remove("shake");
+
+            // Browser zwingen, die Animation neu zu starten
+            void mainContent.offsetWidth;
+
+            // Schütteln
+            mainContent.classList.add("shake");
+
+            // Nach dem Schütteln wieder fokussieren
+            setTimeout(function() {
+                mainContent.classList.remove("shake");
+                input.focus();
+            }, 500);
+        }
+    }
+
+
+    // Enter-Taste
+    input.addEventListener("keydown", function(event) {
+
+        if (event.key === "Enter") {
+            event.preventDefault();
+            checkAnswer();
+        }
+
+    });
+
+</script>
+
+</body>
+</html>
