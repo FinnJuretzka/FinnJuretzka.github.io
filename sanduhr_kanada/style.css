@@ -134,6 +134,8 @@ main {
   line-height: 1;
   color: var(--ink);
   white-space: nowrap;
+  display: inline-block;
+  text-align: center;
 }
 
 /* seconds block should use same color as rest */
@@ -145,25 +147,47 @@ main {
   color: var(--ink-muted);
 }
 
-/* Each digit inside seconds gets its own inline-box to avoid shifting */
+/* Jede Ziffer mit fester Breite und Position */
 .unit .value .sd {
   display: inline-block;
-  min-width: 1ch;
+  width: 1ch;
   text-align: center;
+  flex-shrink: 0;
 }
+
+/* Trennzeichen (Komma) bekommt auch feste Position */
 .unit .value .sd.sep {
-  min-width: 0.5ch;
-  padding: 0 0.1ch;
+  width: 0.5ch;
+  padding: 0;
 }
 
 /* feste Breiten pro Ziffern-Widget verhindern Verschieben beim Aktualisieren */
-#cd-days, #cd-hours, #cd-minutes, #cd-seconds {
+#cd-days {
   display: inline-block;
   text-align: center;
+  min-width: 3ch;
+  width: 3ch;
 }
 
-/* passende Mindestbreiten (ch = Breite der '0' im aktuellen Font) */
-#cd-days    { min-width: 3ch; }   /* 3 Stellen */
-#cd-hours   { min-width: 2ch; }   /* 2 Stellen */
-#cd-minutes { min-width: 2ch; }   /* 2 Stellen */
-#cd-seconds { min-width: 5ch; }   /* z.B. "00,00" = 5 Zeichen */
+#cd-hours {
+  display: inline-block;
+  text-align: center;
+  min-width: 2ch;
+  width: 2ch;
+}
+
+#cd-minutes {
+  display: inline-block;
+  text-align: center;
+  min-width: 2ch;
+  width: 2ch;
+}
+
+/* Sekunden mit Centisekunden: "00,00" = 5 Zeichen */
+#cd-seconds {
+  display: inline-block;
+  text-align: center;
+  min-width: 5ch;
+  width: 5ch;
+  letter-spacing: 0;
+}
