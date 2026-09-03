@@ -92,6 +92,8 @@ main {
 .countdown {
   text-align: center;
   padding: 0 4px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .context {
@@ -104,15 +106,11 @@ main {
   line-height: 1.1;
   color: var(--gold);
   /* Begrenzt auf die gleiche Breite wie das Kartenbild */
-  max-width: calc(100vw - 36px);
+  width: 100%;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  /* Ermöglicht Skalierung des Textes wenn er nicht passt */
-  transform-origin: center;
-  display: inline-block;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .label {
