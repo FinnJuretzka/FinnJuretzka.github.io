@@ -99,8 +99,8 @@ main {
   font-family: "Fraunces", serif;
   font-style: italic;
   font-weight: 500;
-  /* Groß, aber skaliert herunter wenn nötig */
-  font-size: clamp(1.8rem, 11vw, 2.8rem);
+  /* Skaliert flüssig, passt sich auch bei schmalen Screens an */
+  font-size: clamp(1.2rem, 11vw, 2.8rem);
   line-height: 1.1;
   color: var(--gold);
   width: 100%;
