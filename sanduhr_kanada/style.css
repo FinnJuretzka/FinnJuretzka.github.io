@@ -102,7 +102,7 @@ main {
   font-style: italic;
   font-weight: 500;
   /* Skaliert flüssig, passt sich auch bei schmalen Screens an */
-  font-size: clamp(1.2rem, 11vw, 2.8rem);
+  font-size: clamp(1.0rem, 9vw, 2.4rem);
   line-height: 1.1;
   color: var(--gold);
   /* Begrenzt auf die gleiche Breite wie das Kartenbild */
