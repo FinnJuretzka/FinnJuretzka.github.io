@@ -103,12 +103,16 @@ main {
   font-size: clamp(1.2rem, 11vw, 2.8rem);
   line-height: 1.1;
   color: var(--gold);
-  width: 100%;
+  /* Begrenzt auf die gleiche Breite wie das Kartenbild */
+  max-width: calc(100vw - 36px);
   white-space: nowrap;
-  overflow: visible;
+  overflow: hidden;
+  text-overflow: ellipsis;
   /* Ermöglicht Skalierung des Textes wenn er nicht passt */
   transform-origin: center;
   display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .label {
