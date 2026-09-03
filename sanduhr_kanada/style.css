@@ -99,14 +99,16 @@ main {
   font-family: "Fraunces", serif;
   font-style: italic;
   font-weight: 500;
-  /* Groß, aber so dass es in eine Zeile passt */
+  /* Groß, aber skaliert herunter wenn nötig */
   font-size: clamp(1.8rem, 11vw, 2.8rem);
   line-height: 1.1;
   color: var(--gold);
   width: 100%;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+  /* Ermöglicht Skalierung des Textes wenn er nicht passt */
+  transform-origin: center;
+  display: inline-block;
 }
 
 .label {
