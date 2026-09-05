@@ -200,3 +200,30 @@ main {
   width: 5ch;
   letter-spacing: 0;
 }
+
+/* Animation für die Dezimalziffern */
+@keyframes wobble-up {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes wobble-down {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+#cd-c-0 {
+  animation: wobble-up 2s ease-in-out 2;
+}
+
+#cd-c-1 {
+  animation: wobble-down 2s ease-in-out 2;
+}
