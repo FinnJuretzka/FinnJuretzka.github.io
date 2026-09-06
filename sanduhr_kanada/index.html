@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Mama & Finn</title>
   <meta name="description" content="Wie weit die Zeit schon gekommen ist.">
 
@@ -50,5 +53,17 @@
   </main>
 
   <script src="script.js"></script>
+  <script>
+    // Reset animation on every page load
+    window.addEventListener('load', function() {
+      var c0 = document.getElementById('cd-c-0');
+      var c1 = document.getElementById('cd-c-1');
+      if (c0 && c1) {
+        // Force reflow to restart animation
+        void c0.offsetWidth;
+        void c1.offsetWidth;
+      }
+    });
+  </script>
 </body>
 </html>
