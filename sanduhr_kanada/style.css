@@ -201,13 +201,13 @@ main {
   letter-spacing: 0;
 }
 
-/* Animation für die Dezimalziffern */
+/* Animation für die Dezimalziffern - 40% der aktuellen Textgröße */
 @keyframes wobble-up {
   0%, 100% {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-3px);
+    transform: translateY(-0.4em);
   }
 }
 
@@ -216,7 +216,7 @@ main {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(3px);
+    transform: translateY(0.4em);
   }
 }
 
