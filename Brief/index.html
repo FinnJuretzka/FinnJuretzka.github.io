@@ -22,6 +22,7 @@
         background: #f7f7f5;
         font-family: Arial, Helvetica, sans-serif;
         color: #111;
+        padding: 30px 0;
     }
 
     .container {
@@ -100,6 +101,108 @@
         90%  { transform: translateX(7px); }
         100% { transform: translateX(0); }
     }
+
+    /* ---------- Video-Player ---------- */
+
+    .video-wrap {
+        display: grid;
+        grid-template-rows: 0fr;
+        margin-top: 25px;
+        transition: grid-template-rows 1.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    .video-wrap.show {
+        grid-template-rows: 1fr;
+    }
+
+    .video-box {
+        overflow: hidden;
+        min-height: 0;
+        opacity: 0;
+        transition: opacity 1.3s ease 0.35s;
+        background: #111;
+        border-radius: 4px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.06);
+    }
+
+    .video-wrap.show .video-box {
+        opacity: 1;
+    }
+
+    .video-status {
+        text-align: left;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 0.95rem;
+        color: #666;
+        padding: 14px 4px 0;
+    }
+
+    .player {
+        position: relative;
+        background: #000;
+        line-height: 0;
+    }
+
+    .player video {
+        width: 100%;
+        display: block;
+        max-height: 70vh;
+    }
+
+    .controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        background: #111;
+    }
+
+    .controls button {
+        background: none;
+        border: none;
+        padding: 4px;
+        cursor: pointer;
+        display: flex;
+        color: #f4f4f2;
+    }
+
+    .controls button svg {
+        width: 20px;
+        height: 20px;
+        fill: #f4f4f2;
+    }
+
+    .progress {
+        flex: 1;
+        position: relative;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.25);
+        border-radius: 2px;
+        cursor: pointer;
+    }
+
+    .progress-fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 0%;
+        background: #f4f4f2;
+        border-radius: 2px;
+    }
+
+    .time {
+        font-size: 0.75rem;
+        color: #b8b8b6;
+        font-variant-numeric: tabular-nums;
+        min-width: 78px;
+        text-align: center;
+    }
+
+    .volume {
+        width: 70px;
+        accent-color: #f4f4f2;
+    }
 </style>
 
 </head>
@@ -119,6 +222,31 @@
 
     <div id="letterWrap" class="letter-wrap">
         <div id="letter" class="letter"></div>
+    </div>
+
+    <div id="videoWrap" class="video-wrap">
+        <div>
+            <div class="video-box">
+                <div class="player">
+                    <video id="video" playsinline preload="metadata"></video>
+                    <div class="controls">
+                        <button id="playBtn" aria-label="Abspielen">
+                            <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+                        </button>
+                        <span class="time" id="timeLabel">0:00 / 0:00</span>
+                        <div class="progress" id="progress">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <input type="range" class="volume" id="volume" min="0" max="1" step="0.01" value="1">
+                        <button id="fullscreenBtn" aria-label="Vollbild">
+                            <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="video-status" id="videoStatus"></div>
+        </div>
     </div>
 
 </div>
@@ -145,6 +273,17 @@ A 250
 `;
 
     // ==========================================================
+    // VIDEO-KONFIGURATION
+    // ==========================================================
+
+    // Nach "wrangler deploy" hier deine Worker-URL eintragen,
+    // z.B. "https://brief-video-gate.deinname.workers.dev"
+    const WORKER_URL = "https://brief-video-gate.finn-jur.workers.dev";
+
+    // Dateiname, unter dem das Video im R2-Bucket liegt
+    const VIDEO_KEY = "brief-video.mp4";
+
+    // ==========================================================
     // AB HIER NICHTS MEHR ÄNDERN
     // ==========================================================
 
@@ -153,12 +292,14 @@ A 250
     const letterWrap = document.getElementById("letterWrap");
     const mainContent = document.getElementById("mainContent");
 
+    const videoWrap = document.getElementById("videoWrap");
+    const videoStatus = document.getElementById("videoStatus");
+    const video = document.getElementById("video");
+    let videoLoaded = false;
+
 
     function checkAnswer() {
 
-        // Eingabe:
-        // Groß-/Kleinschreibung ignorieren
-        // ALLE Leerzeichen entfernen
         const answer = input.value
             .toLowerCase()
             .replace(/\s+/g, "");
@@ -173,6 +314,9 @@ A 250
             letter.textContent = briefText;
             letterWrap.classList.add("show");
 
+            videoWrap.classList.add("show");
+            unlockVideo(answer);
+
         }
 
 
@@ -182,22 +326,15 @@ A 250
 
         else {
 
-            // Brief verstecken
             letterWrap.classList.remove("show");
+            videoWrap.classList.remove("show");
 
-            // Eingabefeld leeren
             input.value = "";
 
-            // Animation zurücksetzen
             mainContent.classList.remove("shake");
-
-            // Browser zwingen, die Animation neu zu starten
             void mainContent.offsetWidth;
-
-            // Schütteln
             mainContent.classList.add("shake");
 
-            // Nach dem Schütteln wieder fokussieren
             setTimeout(function() {
                 mainContent.classList.remove("shake");
                 input.focus();
@@ -206,14 +343,113 @@ A 250
     }
 
 
-    // Enter-Taste
-    input.addEventListener("keydown", function(event) {
+    async function unlockVideo(password) {
 
+        if (videoLoaded) return;
+
+        videoStatus.textContent = "Video wird geladen …";
+
+        try {
+            const res = await fetch(WORKER_URL + "/auth", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ password: password })
+            });
+
+            if (!res.ok) {
+                videoStatus.textContent = "Video konnte nicht geladen werden.";
+                return;
+            }
+
+            const data = await res.json();
+            const src = WORKER_URL + "/video/" + encodeURIComponent(VIDEO_KEY) + "?token=" + data.token;
+
+            video.src = src;
+            videoLoaded = true;
+            videoStatus.textContent = "";
+
+        } catch (err) {
+            videoStatus.textContent = "Video konnte nicht geladen werden.";
+        }
+    }
+
+
+    input.addEventListener("keydown", function(event) {
         if (event.key === "Enter") {
             event.preventDefault();
             checkAnswer();
         }
+    });
 
+
+    // ---------- Player-Steuerung ----------
+
+    const playBtn = document.getElementById("playBtn");
+    const playIcon = document.getElementById("playIcon");
+    const pauseIcon = document.getElementById("pauseIcon");
+    const progress = document.getElementById("progress");
+    const progressFill = document.getElementById("progressFill");
+    const timeLabel = document.getElementById("timeLabel");
+    const volume = document.getElementById("volume");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+
+    function formatTime(sec) {
+        if (!isFinite(sec)) return "0:00";
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60).toString().padStart(2, "0");
+        return m + ":" + s;
+    }
+
+    playBtn.addEventListener("click", function() {
+        if (video.paused) {
+            video.play();
+        } else {
+            video.pause();
+        }
+    });
+
+    video.addEventListener("play", function() {
+        playIcon.style.display = "none";
+        pauseIcon.style.display = "block";
+    });
+
+    video.addEventListener("pause", function() {
+        playIcon.style.display = "block";
+        pauseIcon.style.display = "none";
+    });
+
+    video.addEventListener("timeupdate", function() {
+        if (video.duration) {
+            progressFill.style.width = (video.currentTime / video.duration * 100) + "%";
+        }
+        timeLabel.textContent = formatTime(video.currentTime) + " / " + formatTime(video.duration);
+    });
+
+    video.addEventListener("loadedmetadata", function() {
+        timeLabel.textContent = formatTime(video.currentTime) + " / " + formatTime(video.duration);
+    });
+
+    function seek(event) {
+        const rect = progress.getBoundingClientRect();
+        const ratio = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1);
+        if (video.duration) {
+            video.currentTime = ratio * video.duration;
+        }
+    }
+
+    progress.addEventListener("click", seek);
+
+    volume.addEventListener("input", function() {
+        video.volume = volume.value;
+    });
+
+    fullscreenBtn.addEventListener("click", function() {
+        const player = video.closest(".player");
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        } else {
+            player.requestFullscreen();
+        }
     });
 
 </script>
