@@ -129,11 +129,41 @@
     }
 
     .video-status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
         text-align: left;
         font-family: Georgia, "Times New Roman", serif;
         font-size: 0.95rem;
         color: #666;
         padding: 14px 4px 0;
+        min-height: 0;
+        opacity: 0;
+        transform: translateY(-4px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .video-status:empty {
+        padding: 0;
+    }
+
+    .video-status.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .spinner {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        border: 2px solid rgba(0, 0, 0, 0.15);
+        border-top-color: #666;
+        flex-shrink: 0;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
     }
 
     .player {
@@ -339,12 +369,14 @@
         autofocus
     >
 
+    <div id="answerStatus" class="video-status"></div>
+
     <div id="letterWrap" class="letter-wrap">
         <div id="letter" class="letter"></div>
     </div>
 
     <div id="videoWrap" class="video-wrap">
-        <div>
+        <div style="overflow: hidden; min-height: 0;">
             <div class="video-box">
                 <div class="player">
                     <video id="video" playsinline webkit-playsinline preload="auto"></video>
@@ -419,6 +451,7 @@ A 250
     // ==========================================================
 
     const input = document.getElementById("answer");
+    const answerStatus = document.getElementById("answerStatus");
     const letter = document.getElementById("letter");
     const letterWrap = document.getElementById("letterWrap");
     const mainContent = document.getElementById("mainContent");
@@ -426,56 +459,62 @@ A 250
     const videoWrap = document.getElementById("videoWrap");
     const videoStatus = document.getElementById("videoStatus");
     const video = document.getElementById("video");
-    let videoLoaded = false;
 
+    // Das Passwort steht bewusst NIRGENDS im Code. Die Eingabe geht direkt
+    // an den Worker; nur der kennt (als Server-Secret) das echte Passwort
+    // und entscheidet, ob es stimmt. So bleibt "Seite untersuchen" wirkungslos.
 
-    function checkAnswer() {
+    let checkInFlight = false;
+    let currentVideoToken = null;
 
-        const answer = input.value
-            .toLowerCase()
-            .replace(/\s+/g, "");
-
-
-        // ======================================================
-        // RICHTIGE ANTWORT
-        // ======================================================
-
-        if (answer === "stadelandesbergen") {
-
-            letter.textContent = briefText;
-            letterWrap.classList.add("show");
-
-            videoWrap.classList.add("show");
-            unlockVideo(answer);
-
-        }
-
-
-        // ======================================================
-        // FALSCHE ANTWORT
-        // ======================================================
-
-        else {
-
-            letterWrap.classList.remove("show");
-            videoWrap.classList.remove("show");
-
-            input.value = "";
-
-            mainContent.classList.remove("shake");
-            void mainContent.offsetWidth;
-            mainContent.classList.add("shake");
-
-            setTimeout(function() {
-                mainContent.classList.remove("shake");
-                input.focus();
-            }, 500);
-        }
+    function sleep(ms) {
+        return new Promise(function(resolve) { setTimeout(resolve, ms); });
     }
 
+    function setStatus(el, text, withSpinner) {
+        el.innerHTML = "";
+        if (!text) {
+            el.classList.remove("show");
+            return;
+        }
+        if (withSpinner) {
+            const spinner = document.createElement("span");
+            spinner.className = "spinner";
+            el.appendChild(spinner);
+        }
+        const msg = document.createElement("span");
+        msg.textContent = text;
+        el.appendChild(msg);
+        el.classList.add("show");
+    }
 
-    function showUnlockRetry(password) {
-        videoStatus.textContent = "";
+    function setVideoStatus(text, withSpinner) {
+        setStatus(videoStatus, text, withSpinner);
+    }
+
+    function setAnswerStatus(text) {
+        setStatus(answerStatus, text, false);
+    }
+
+    function wrongAnswerFeedback() {
+
+        letterWrap.classList.remove("show");
+        videoWrap.classList.remove("show");
+
+        input.value = "";
+
+        mainContent.classList.remove("shake");
+        void mainContent.offsetWidth;
+        mainContent.classList.add("shake");
+
+        setTimeout(function() {
+            mainContent.classList.remove("shake");
+            input.focus();
+        }, 500);
+    }
+
+    function showUnlockRetry() {
+        setVideoStatus(null);
         const msg = document.createElement("span");
         msg.textContent = "Video konnte nicht geladen werden. ";
         const retry = document.createElement("a");
@@ -484,40 +523,112 @@ A 250
         retry.style.color = "inherit";
         retry.addEventListener("click", function(event) {
             event.preventDefault();
-            unlockVideo(password);
+            if (currentVideoToken) {
+                revealVideo(currentVideoToken);
+            }
         });
         videoStatus.appendChild(msg);
         videoStatus.appendChild(retry);
+        videoStatus.classList.add("show");
     }
 
-    async function unlockVideo(password) {
+    async function loadVideoFrame(token) {
 
-        if (videoLoaded) return;
+        const src = WORKER_URL + "/video/" + encodeURIComponent(VIDEO_KEY) + "?token=" + token;
+        video.src = src;
+        video.load();
 
-        videoStatus.textContent = "Video wird geladen …";
+        await new Promise(function(resolve, reject) {
+            video.addEventListener("loadeddata", resolve, { once: true });
+            video.addEventListener("error", reject, { once: true });
+        });
+
+        // Ohne das hier bleibt der erste Frame bis zum Abspielen schwarz.
+        if (video.currentTime === 0) {
+            video.currentTime = 0.001;
+        }
+    }
+
+    // Blendet das Video ein - grundsätzlich erst 1,3s nach dem Brief, damit
+    // es sich gestaffelt anfühlt, und nie bevor ein echter Frame steht.
+    // Nur wenn das Laden länger dauert als diese Pause, gibt es kurz einen
+    // Hinweis mit Spinner.
+    async function revealVideo(token) {
+
+        currentVideoToken = token;
+        videoWrap.classList.add("show");
+
+        const framePromise = loadVideoFrame(token);
+        const minDelay = sleep(1300);
+        let stillWaiting = true;
+        framePromise.then(function() { stillWaiting = false; }, function() { stillWaiting = false; });
+
+        minDelay.then(function() {
+            if (stillWaiting) setVideoStatus("Video wird geladen …", true);
+        });
+
+        try {
+            await Promise.all([framePromise, minDelay]);
+            setVideoStatus(null);
+        } catch (err) {
+            setVideoStatus(null);
+            showUnlockRetry();
+        }
+    }
+
+    async function checkAnswer() {
+
+        if (checkInFlight) return;
+
+        const answer = input.value
+            .toLowerCase()
+            .replace(/\s+/g, "");
+
+        if (!answer) return;
+
+        checkInFlight = true;
+        setAnswerStatus(null);
+
+        let result;
 
         try {
             const res = await fetch(WORKER_URL + "/auth", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ password: password })
+                body: JSON.stringify({ password: answer })
             });
 
-            if (!res.ok) {
-                showUnlockRetry(password);
-                return;
+            if (res.status === 401 || res.status === 403) {
+                result = { ok: false, wrongPassword: true };
+            } else if (!res.ok) {
+                result = { ok: false, wrongPassword: false };
+            } else {
+                const data = await res.json();
+                result = { ok: true, token: data.token };
             }
 
-            const data = await res.json();
-            const src = WORKER_URL + "/video/" + encodeURIComponent(VIDEO_KEY) + "?token=" + data.token;
-
-            video.src = src;
-            video.load();
-            videoLoaded = true;
-            videoStatus.textContent = "";
-
         } catch (err) {
-            showUnlockRetry(password);
+            result = { ok: false, wrongPassword: false };
+        }
+
+        checkInFlight = false;
+
+        if (result.ok) {
+
+            letter.textContent = briefText;
+            letterWrap.classList.add("show");
+
+            revealVideo(result.token);
+
+        } else if (result.wrongPassword) {
+
+            wrongAnswerFeedback();
+
+        } else {
+
+            // Verbindung/Server-Fehler - wir wissen nicht, ob das Passwort
+            // stimmt, deshalb kein "Falsch"-Shake, sondern ein Hinweis.
+            setAnswerStatus("Verbindung fehlgeschlagen - bitte kurz erneut versuchen.");
         }
     }
 
@@ -560,7 +671,7 @@ A 250
         if (playPromise !== undefined) {
             playPromise.catch(function(err) {
                 console.error("Wiedergabe fehlgeschlagen:", err);
-                videoStatus.textContent = "Wiedergabe konnte nicht gestartet werden. Bitte erneut versuchen.";
+                setVideoStatus("Wiedergabe konnte nicht gestartet werden. Bitte erneut versuchen.");
             });
         }
     }
@@ -632,15 +743,15 @@ A 250
     });
 
     video.addEventListener("waiting", function() {
-        videoStatus.textContent = "Video wird gepuffert …";
+        setVideoStatus("Video wird gepuffert …", true);
     });
 
     video.addEventListener("playing", function() {
-        videoStatus.textContent = "";
+        setVideoStatus(null);
     });
 
     video.addEventListener("error", function() {
-        videoStatus.textContent = "Beim Abspielen ist ein Fehler aufgetreten. Bitte die Seite neu laden.";
+        setVideoStatus("Beim Abspielen ist ein Fehler aufgetreten. Bitte die Seite neu laden.");
     });
 
     // ---------- Fortschrittsbalken: klicken UND ziehen, per Maus, Finger oder Stift ----------
