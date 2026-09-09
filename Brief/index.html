@@ -149,22 +149,15 @@
         background: #000;
     }
 
-    /* Vollbild: Video + Leiste als Ganzes vertikal zentrieren,
-       damit oben und unten der gleiche Abstand entsteht,
-       und in voller Fensterbreite/-höhe darstellen. */
+    /* Vollbild: Video füllt die ganze Fläche, object-fit sorgt automatisch
+       für gleiche Abstände oben/unten bzw. links/rechts (Letterboxing). */
     .player:fullscreen {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
         width: 100vw;
         height: 100vh;
         background: #000;
     }
 
     .player:-webkit-full-screen {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
         width: 100vw;
         height: 100vh;
         background: #000;
@@ -172,18 +165,41 @@
 
     .player:fullscreen video {
         width: 100%;
-        height: auto;
-        max-height: calc(100vh - 48px);
+        height: 100%;
         object-fit: contain;
-        flex-shrink: 0;
     }
 
     .player:-webkit-full-screen video {
         width: 100%;
-        height: auto;
-        max-height: calc(100vh - 48px);
+        height: 100%;
         object-fit: contain;
-        flex-shrink: 0;
+    }
+
+    /* Im Vollbildmodus schweben die Bedienelemente über dem Video
+       und können nach Inaktivität sanft ausgeblendet werden. */
+    .player:fullscreen .controls {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: auto;
+        padding: 34px 16px 16px;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
+    }
+
+    .player:-webkit-full-screen .controls {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: auto;
+        padding: 34px 16px 16px;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
+    }
+
+    .player.controls-hidden .controls {
+        opacity: 0;
+        pointer-events: none;
     }
 
     .controls {
@@ -194,6 +210,7 @@
         padding: 0 14px;
         background: #111;
         flex-shrink: 0;
+        transition: opacity 0.4s ease;
     }
 
     .controls button {
@@ -528,6 +545,8 @@ A 250
     const fullscreenBtn = document.getElementById("fullscreenBtn");
     const fsEnterIcon = document.getElementById("fsEnterIcon");
     const fsExitIcon = document.getElementById("fsExitIcon");
+    const player = video.closest(".player");
+    const controlsEl = document.querySelector(".controls");
 
     function formatTime(sec) {
         if (!isFinite(sec)) return "0:00";
@@ -565,11 +584,19 @@ A 250
     video.addEventListener("play", function() {
         playIcon.style.display = "none";
         pauseIcon.style.display = "block";
+        armHideTimer();
     });
 
     video.addEventListener("pause", function() {
         playIcon.style.display = "block";
         pauseIcon.style.display = "none";
+        clearTimeout(hideControlsTimer);
+        showControls();
+    });
+
+    video.addEventListener("ended", function() {
+        clearTimeout(hideControlsTimer);
+        showControls();
     });
 
     let isDragging = false;
@@ -665,8 +692,6 @@ A 250
     }
 
     fullscreenBtn.addEventListener("click", function() {
-        const player = video.closest(".player");
-
         // Manche älteren iOS-Versionen unterstützen die Fullscreen-API nur
         // direkt am <video>-Element, nicht am umgebenden Container.
         if (!player.requestFullscreen && !player.webkitRequestFullscreen && video.webkitEnterFullscreen) {
@@ -687,8 +712,49 @@ A 250
         }
     });
 
-    document.addEventListener("fullscreenchange", updateFullscreenIcon);
-    document.addEventListener("webkitfullscreenchange", updateFullscreenIcon);
+    function onFullscreenChange() {
+        updateFullscreenIcon();
+        if (isFullscreen()) {
+            armHideTimer();
+        } else {
+            clearTimeout(hideControlsTimer);
+            showControls();
+        }
+    }
+
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", onFullscreenChange);
+
+    // ---------- Bedienelemente im Vollbild nach 3s Inaktivität ausblenden ----------
+
+    let hideControlsTimer = null;
+
+    function showControls() {
+        player.classList.remove("controls-hidden");
+    }
+
+    function armHideTimer() {
+        clearTimeout(hideControlsTimer);
+        if (!isFullscreen() || video.paused || isDragging) return;
+        hideControlsTimer = setTimeout(function() {
+            player.classList.add("controls-hidden");
+        }, 3000);
+    }
+
+    function handleActivity() {
+        showControls();
+        armHideTimer();
+    }
+
+    player.addEventListener("pointermove", handleActivity);
+    player.addEventListener("pointerdown", handleActivity);
+
+    controlsEl.addEventListener("pointerenter", function() {
+        clearTimeout(hideControlsTimer);
+        showControls();
+    });
+
+    controlsEl.addEventListener("pointerleave", armHideTimer);
 
 </script>
 
