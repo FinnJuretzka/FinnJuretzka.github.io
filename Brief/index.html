@@ -1,7 +1,6 @@
 <!-- Moin Paul! Ich bin jetzt auch ins Website-Vibe-Coding eingestiegen! Und rate mal, womit ich heute Abend (28.8) angefangen habe! -->
 
 <!DOCTYPE html>
-
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -147,14 +146,54 @@
         width: 100%;
         display: block;
         max-height: 70vh;
+        background: #000;
+    }
+
+    /* Vollbild: Video + Leiste als Ganzes vertikal zentrieren,
+       damit oben und unten der gleiche Abstand entsteht,
+       und in voller Fensterbreite/-höhe darstellen. */
+    .player:fullscreen {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+    }
+
+    .player:-webkit-full-screen {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+    }
+
+    .player:fullscreen video {
+        width: 100%;
+        height: auto;
+        max-height: calc(100vh - 48px);
+        object-fit: contain;
+        flex-shrink: 0;
+    }
+
+    .player:-webkit-full-screen video {
+        width: 100%;
+        height: auto;
+        max-height: calc(100vh - 48px);
+        object-fit: contain;
+        flex-shrink: 0;
     }
 
     .controls {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 10px 14px;
+        gap: 10px;
+        height: 48px;
+        padding: 0 14px;
         background: #111;
+        flex-shrink: 0;
     }
 
     .controls button {
@@ -164,6 +203,19 @@
         cursor: pointer;
         display: flex;
         color: #f4f4f2;
+        opacity: 0.85;
+        border-radius: 4px;
+        transition: opacity 0.15s ease;
+    }
+
+    .controls button:hover,
+    .controls button:focus-visible {
+        opacity: 1;
+    }
+
+    .controls button:focus-visible {
+        outline: 2px solid rgba(244, 244, 242, 0.6);
+        outline-offset: 1px;
     }
 
     .controls button svg {
@@ -175,20 +227,58 @@
     .progress {
         flex: 1;
         position: relative;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        touch-action: none;
+    }
+
+    .progress-track {
+        position: absolute;
+        left: 0;
+        right: 0;
         height: 4px;
         background: rgba(255, 255, 255, 0.25);
         border-radius: 2px;
-        cursor: pointer;
+    }
+
+    .progress-buffered {
+        position: absolute;
+        left: 0;
+        height: 4px;
+        width: 0%;
+        background: rgba(255, 255, 255, 0.4);
+        border-radius: 2px;
     }
 
     .progress-fill {
         position: absolute;
         left: 0;
-        top: 0;
-        height: 100%;
+        height: 4px;
         width: 0%;
         background: #f4f4f2;
         border-radius: 2px;
+    }
+
+    .progress-thumb {
+        position: absolute;
+        top: 50%;
+        left: 0%;
+        width: 12px;
+        height: 12px;
+        background: #f4f4f2;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        pointer-events: none;
+    }
+
+    .progress:hover .progress-thumb,
+    .progress.dragging .progress-thumb {
+        opacity: 1;
     }
 
     .time {
@@ -199,9 +289,21 @@
         text-align: center;
     }
 
-    .volume {
-        width: 70px;
-        accent-color: #f4f4f2;
+    @media (max-width: 420px) {
+        .controls {
+            gap: 6px;
+            padding: 0 10px;
+        }
+
+        .controls button svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .time {
+            min-width: 62px;
+            font-size: 0.68rem;
+        }
     }
 </style>
 
@@ -228,19 +330,31 @@
         <div>
             <div class="video-box">
                 <div class="player">
-                    <video id="video" playsinline preload="metadata"></video>
+                    <video id="video" playsinline webkit-playsinline preload="auto"></video>
                     <div class="controls">
+                        <button id="restartBtn" aria-label="Von vorne abspielen">
+                            <svg viewBox="0 0 24 24"><rect x="5" y="5" width="2" height="14"/><path d="M19 5L8 12l11 7V5z"/></svg>
+                        </button>
+                        <button id="rewindBtn" aria-label="10 Sekunden zurückspringen">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+                                <text x="12" y="16.3" text-anchor="middle" font-size="7" font-family="Arial, Helvetica, sans-serif" font-weight="700">10</text>
+                            </svg>
+                        </button>
                         <button id="playBtn" aria-label="Abspielen">
                             <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                             <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
                         </button>
                         <span class="time" id="timeLabel">0:00 / 0:00</span>
                         <div class="progress" id="progress">
+                            <div class="progress-track"></div>
+                            <div class="progress-buffered" id="progressBuffered"></div>
                             <div class="progress-fill" id="progressFill"></div>
+                            <div class="progress-thumb" id="progressThumb"></div>
                         </div>
-                        <input type="range" class="volume" id="volume" min="0" max="1" step="0.01" value="1">
                         <button id="fullscreenBtn" aria-label="Vollbild">
-                            <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                            <svg id="fsEnterIcon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                            <svg id="fsExitIcon" viewBox="0 0 24 24" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
                         </button>
                     </div>
                 </div>
@@ -343,6 +457,22 @@ A 250
     }
 
 
+    function showUnlockRetry(password) {
+        videoStatus.textContent = "";
+        const msg = document.createElement("span");
+        msg.textContent = "Video konnte nicht geladen werden. ";
+        const retry = document.createElement("a");
+        retry.href = "#";
+        retry.textContent = "Erneut versuchen";
+        retry.style.color = "inherit";
+        retry.addEventListener("click", function(event) {
+            event.preventDefault();
+            unlockVideo(password);
+        });
+        videoStatus.appendChild(msg);
+        videoStatus.appendChild(retry);
+    }
+
     async function unlockVideo(password) {
 
         if (videoLoaded) return;
@@ -357,7 +487,7 @@ A 250
             });
 
             if (!res.ok) {
-                videoStatus.textContent = "Video konnte nicht geladen werden.";
+                showUnlockRetry(password);
                 return;
             }
 
@@ -365,11 +495,12 @@ A 250
             const src = WORKER_URL + "/video/" + encodeURIComponent(VIDEO_KEY) + "?token=" + data.token;
 
             video.src = src;
+            video.load();
             videoLoaded = true;
             videoStatus.textContent = "";
 
         } catch (err) {
-            videoStatus.textContent = "Video konnte nicht geladen werden.";
+            showUnlockRetry(password);
         }
     }
 
@@ -387,11 +518,16 @@ A 250
     const playBtn = document.getElementById("playBtn");
     const playIcon = document.getElementById("playIcon");
     const pauseIcon = document.getElementById("pauseIcon");
+    const restartBtn = document.getElementById("restartBtn");
+    const rewindBtn = document.getElementById("rewindBtn");
     const progress = document.getElementById("progress");
     const progressFill = document.getElementById("progressFill");
+    const progressBuffered = document.getElementById("progressBuffered");
+    const progressThumb = document.getElementById("progressThumb");
     const timeLabel = document.getElementById("timeLabel");
-    const volume = document.getElementById("volume");
     const fullscreenBtn = document.getElementById("fullscreenBtn");
+    const fsEnterIcon = document.getElementById("fsEnterIcon");
+    const fsExitIcon = document.getElementById("fsExitIcon");
 
     function formatTime(sec) {
         if (!isFinite(sec)) return "0:00";
@@ -400,12 +536,30 @@ A 250
         return m + ":" + s;
     }
 
+    function safePlay() {
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(function(err) {
+                console.error("Wiedergabe fehlgeschlagen:", err);
+                videoStatus.textContent = "Wiedergabe konnte nicht gestartet werden. Bitte erneut versuchen.";
+            });
+        }
+    }
+
     playBtn.addEventListener("click", function() {
-        if (video.paused) {
-            video.play();
+        if (video.paused || video.ended) {
+            safePlay();
         } else {
             video.pause();
         }
+    });
+
+    restartBtn.addEventListener("click", function() {
+        video.currentTime = 0;
+    });
+
+    rewindBtn.addEventListener("click", function() {
+        video.currentTime = Math.max(0, video.currentTime - 10);
     });
 
     video.addEventListener("play", function() {
@@ -418,39 +572,123 @@ A 250
         pauseIcon.style.display = "none";
     });
 
+    let isDragging = false;
+
+    function setProgressUI(ratio) {
+        const pct = Math.min(Math.max(ratio, 0), 1) * 100;
+        progressFill.style.width = pct + "%";
+        progressThumb.style.left = pct + "%";
+    }
+
     video.addEventListener("timeupdate", function() {
-        if (video.duration) {
-            progressFill.style.width = (video.currentTime / video.duration * 100) + "%";
+        if (!isDragging && video.duration) {
+            setProgressUI(video.currentTime / video.duration);
         }
         timeLabel.textContent = formatTime(video.currentTime) + " / " + formatTime(video.duration);
     });
 
     video.addEventListener("loadedmetadata", function() {
         timeLabel.textContent = formatTime(video.currentTime) + " / " + formatTime(video.duration);
+
+        // Ohne das hier bleibt der Player bis zum ersten Abspielen schwarz,
+        // weil der Browser sonst noch keinen Frame gezeichnet hat.
+        if (video.currentTime === 0) {
+            video.currentTime = 0.001;
+        }
     });
 
-    function seek(event) {
+    video.addEventListener("progress", function() {
+        if (video.duration && video.buffered.length) {
+            const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+            progressBuffered.style.width = (bufferedEnd / video.duration * 100) + "%";
+        }
+    });
+
+    video.addEventListener("waiting", function() {
+        videoStatus.textContent = "Video wird gepuffert …";
+    });
+
+    video.addEventListener("playing", function() {
+        videoStatus.textContent = "";
+    });
+
+    video.addEventListener("error", function() {
+        videoStatus.textContent = "Beim Abspielen ist ein Fehler aufgetreten. Bitte die Seite neu laden.";
+    });
+
+    // ---------- Fortschrittsbalken: klicken UND ziehen, per Maus, Finger oder Stift ----------
+
+    function ratioFromEvent(event) {
         const rect = progress.getBoundingClientRect();
-        const ratio = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1);
+        return Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1);
+    }
+
+    function scrubTo(event) {
+        const ratio = ratioFromEvent(event);
+        setProgressUI(ratio);
         if (video.duration) {
             video.currentTime = ratio * video.duration;
         }
     }
 
-    progress.addEventListener("click", seek);
-
-    volume.addEventListener("input", function() {
-        video.volume = volume.value;
+    progress.addEventListener("pointerdown", function(event) {
+        isDragging = true;
+        progress.classList.add("dragging");
+        progress.setPointerCapture(event.pointerId);
+        scrubTo(event);
     });
+
+    progress.addEventListener("pointermove", function(event) {
+        if (!isDragging) return;
+        scrubTo(event);
+    });
+
+    function stopScrubbing() {
+        isDragging = false;
+        progress.classList.remove("dragging");
+    }
+
+    progress.addEventListener("pointerup", stopScrubbing);
+    progress.addEventListener("pointercancel", stopScrubbing);
+
+    // ---------- Vollbild: mit Icon-Wechsel und Fallback für älteres Safari/iOS ----------
+
+    function isFullscreen() {
+        return !!(document.fullscreenElement || document.webkitFullscreenElement);
+    }
+
+    function updateFullscreenIcon() {
+        const active = isFullscreen();
+        fsEnterIcon.style.display = active ? "none" : "block";
+        fsExitIcon.style.display = active ? "block" : "none";
+        fullscreenBtn.setAttribute("aria-label", active ? "Vollbild verlassen" : "Vollbild");
+    }
 
     fullscreenBtn.addEventListener("click", function() {
         const player = video.closest(".player");
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
-        } else {
+
+        // Manche älteren iOS-Versionen unterstützen die Fullscreen-API nur
+        // direkt am <video>-Element, nicht am umgebenden Container.
+        if (!player.requestFullscreen && !player.webkitRequestFullscreen && video.webkitEnterFullscreen) {
+            video.webkitEnterFullscreen();
+            return;
+        }
+
+        if (isFullscreen()) {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        } else if (player.requestFullscreen) {
             player.requestFullscreen();
+        } else if (player.webkitRequestFullscreen) {
+            player.webkitRequestFullscreen();
         }
     });
+
+    document.addEventListener("fullscreenchange", updateFullscreenIcon);
+    document.addEventListener("webkitfullscreenchange", updateFullscreenIcon);
 
 </script>
 
